@@ -19,14 +19,19 @@ fn main() {
         let input_string:String = input();
         let input_tokens = input_string.split(" ").collect::<Vec<&str>>();
 
-        print!("\n... {:?}\n", input_tokens);
+        // operate on each input
+        match input_tokens.as_slice() {
+            ["set", _] => println!("you cast set!"),
+            _ => println!("{:?}", input_tokens)
+        };
+
     }
 }
 
 /*
 todos
  x loop over input, printing response
- - tokenize each line
+ x tokenize each line
  - implement 'set x 0'
  - use arbitrary precision for each value
 */
