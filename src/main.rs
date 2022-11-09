@@ -1,4 +1,6 @@
 use std::io::{stdin,stdout,Write};
+use std::collections::HashMap;
+
 
 fn input() -> String {
     let mut ss = String::new();
@@ -14,18 +16,23 @@ fn input() -> String {
 }
 
 fn main() {
+    let mut state: HashMap<&str, &str> = HashMap::new();
+
     loop {
         print!(">>> ");
-        let input_string:String = input();
-        let input_tokens = input_string.split(" ").collect::<Vec<&str>>();
+        let mut input_string: String = input();
+        let mut input_tokens: Vec<&str> = input_string.split(" ").collect::<Vec<&str>>();
+
 
         // operate on each input
         match input_tokens.as_slice() {
-            ["set", _] => println!("you cast set!"),
+            ["set", kk, vv] => {
+                state.insert(kk, vv);
+                //println!("Updated state: {:?}", state);
+            }
             _ => println!("{:?}", input_tokens)
-        };
-
-    }
+        }
+    };
 }
 
 /*
