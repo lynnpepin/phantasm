@@ -1,16 +1,19 @@
-use std::io::{stdin,stdout,Write};
 use std::collections::HashMap;
-
+use std::io::{stdin, stdout, Write};
 
 fn input() -> String {
     let mut ss = String::new();
-    stdout().flush();  // Ensure chars get printed before the prompt
+    stdout().flush(); // Ensure chars get printed before the prompt
 
     stdin().read_line(&mut ss).expect("Broken string");
 
     // Remove newlines if the terminal brings them in
-    if let Some('\n')=ss.chars().next_back() { ss.pop(); }
-    if let Some('\r')=ss.chars().next_back() { ss.pop(); }
+    if let Some('\n') = ss.chars().next_back() {
+        ss.pop();
+    }
+    if let Some('\r') = ss.chars().next_back() {
+        ss.pop();
+    }
 
     ss
 }
@@ -22,15 +25,15 @@ fn main() {
         print!(">>> ");
         let input_string: String = input();
         let input_tokens: Vec<&str> = input_string.split(" ").collect::<Vec<&str>>();
-        
-        // operate on each input
+
+        // Operate on each line
         match input_tokens.as_slice() {
             ["set", kk, vv] => {
-                println!("{}{}", kk, vv); // THIS works... But not updating state.
+                println!("{}{}", kk, vv);
                 state.insert(kk.to_string(), vv.to_string());
                 println!("Updated state: {:?}", state);
-            },
-            _ => println!("{:?}", input_tokens)
+            }
+            _ => println!("{:?}", input_tokens),
         }
     }
 }
