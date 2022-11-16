@@ -16,22 +16,19 @@ fn input() -> String {
 }
 
 fn main() {
-    let mut state: HashMap<&str, &str> = HashMap::new();
-    let mut input_string: String;
-    let mut input_tokens: Vec<&str>;
+    let mut state: HashMap<String, String> = HashMap::new();
 
     loop {
         print!(">>> ");
-        //let input_string: String = input();
-        //let input_tokens: Vec<&str> = input_string.split(" ").collect::<Vec<&str>>();
-        input_string = input();
-        input_tokens = input_string.split(" ").collect::<Vec<&str>>();
+        let input_string: String = input();
+        let input_tokens: Vec<&str> = input_string.split(" ").collect::<Vec<&str>>();
+        
         // operate on each input
         match input_tokens.as_slice() {
             ["set", kk, vv] => {
                 println!("{}{}", kk, vv); // THIS works... But not updating state.
-                state.insert(kk.clone(), vv.clone());
-                //println!("Updated state: {:?}", state);
+                state.insert(kk.to_string(), vv.to_string());
+                println!("Updated state: {:?}", state);
             },
             _ => println!("{:?}", input_tokens)
         }
