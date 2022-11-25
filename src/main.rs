@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::io::{stdin, stdout, Write};
+//use rug::{Integer, Ratioal, Float, Assign};
 
 fn input() -> String {
     let mut ss = String::new();
@@ -66,5 +67,5 @@ todos
  - implement 'get x', 'del x',
  - hashmap can take String, i64, or f64
  - implement add, sub
- - use arbitrary precision for each value
+ - use arbitrary precision for each value, casting from i64 -> Integer -> Rational -> Float as needed
 */
