@@ -39,6 +39,51 @@ fn main() {
                 state.remove(&kk.to_string());
                 println!("Updated state: {:?}", state);
             },
+            ["add", kk, kx, ky] => {
+                println!("add {} {} {}", kk, kx, ky);
+                let x: i32 = kx.parse().expect("Not a number");
+                let y: i32 = ky.parse().expect("Not a number");
+                let z: i32 = x + y;
+                state.insert(kk.to_string(), z.to_string());
+                println!("Updated state: {:?}", state);
+            },
+            ["sub", kk, kx, ky] => {
+                println!("sub {} {} {}", kk, kx, ky);
+                let x: i32 = kx.parse().expect("Not a number");
+                let y: i32 = ky.parse().expect("Not a number");
+                let z: i32 = x - y;
+                state.insert(kk.to_string(), z.to_string());
+                println!("Updated state: {:?}", state);
+            },
+            ["mul", kk, kx, ky] => {
+                println!("mul {} {} {}", kk, kx, ky);
+                let x: i32 = kx.parse().expect("Not a number");
+                let y: i32 = ky.parse().expect("Not a number");
+                let z: i32 = x * y;
+                state.insert(kk.to_string(), z.to_string());
+                println!("Updated state: {:?}", state);
+            },
+            ["div", kk, kx, ky] => {
+                println!("div {} {} {}", kk, kx, ky);
+                let x: i32 = kx.parse().expect("Not a number");
+                let y: i32 = ky.parse().expect("Not a number");
+                let z: i32 = x / y;
+                state.insert(kk.to_string(), z.to_string());
+                println!("Updated state: {:?}", state);
+            },
+/*
+            ["get", kk] => {
+                println!("get {}", kk);
+                match state.get(&kk.to_string()) {
+                    Some(vv) => println!("{} = {}", kk, vv),
+                    None => println!("{} not found", kk),
+                }
+            },
+*/
+            ["exit"] => {
+                println!("exit");
+                break;
+            },
             _ => println!("{:?}", input_tokens),
         }
     }
