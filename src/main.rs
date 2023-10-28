@@ -54,6 +54,21 @@ impl Add for Number {
     }
 }
 
+
+impl From<&str> for Number {
+    fn from(ss: &str) -> Self {
+        if let Ok(vv) = ss.parse::<i64>() {
+            Number::I64(vv)
+        } else if let Ok(vv) = ss.parse::<f64>() {
+            Number::F64(vv)
+        } else {
+            // todo: do something other than panic
+            panic!("yeah i didn't think that would work either");
+        }
+    }
+}
+
+
 fn _debug_add_main() {
     // yessss
     println!("{:?}", Number::from(1));
@@ -64,11 +79,17 @@ fn _debug_add_main() {
     println!("{:?}", Number::from(1.0) + Number::from(1.0));
 }
 
+fn _debug_from_string() {
+    // YESSSSSSSS
+    println!("{:?}", Number::from("1"));
+    println!("{:?}", Number::from("3.14"));
+    println!("{:?}", Number::from("1") + Number::from("1"));
+    println!("{:?}", Number::from("1.0") + Number::from("1"));
+    println!("{:?}", Number::from("1") + Number::from("1.0"));
+    println!("{:?}", Number::from("1.0") + Number::from("1.0"));
+}
 
-/* Phantasm numbers are currently just i64...
 
-Soon, implement enum Number {i64, f64, arbitrary precision), etc.
-*/
 fn get_value(
     token: &str,
     state: &HashMap<String, i64>
@@ -81,7 +102,9 @@ fn get_value(
     }
 }
 
-fn main() {
+
+
+fn notmain() {
     // Store instructions (list of str), instruction index, state (variable hashmap)
     // Instructions: List of string representing pseudo-ASM instructions
     let mut instructions: Vec<String> = Vec::new();
@@ -98,32 +121,22 @@ fn main() {
 
         // Operate on each line
         match input_tokens.as_slice() {
-            // Direclty manipulate and view state
+            // Directly manipulate and view state
             ["set", kk, vv] => {
                 println!("set {} = {}", kk, vv);
                 state.insert(kk.to_string(), vv.parse::<i64>().expect("Not a number"));
-                println!("Updated state: {:?}", state);
+                println!("Updated state: {:?}", state)
             },
             ["del", kk] => {
                 println!("del {}", kk);
                 state.remove(&kk.to_string());
-                println!("Updated state: {:?}", state);
+                println!("Updated state: {:?}", state)
             },
-            ["print"] => {
-                println!("{:?}", state);
-            }
-            ["print", kk] => {
-                println!("{}", get_value(kk, &state));
-            },
-            ["bprint", kk] => {
-                println!("0b{:b}", get_value(kk, &state));
-            },
-            ["xprint", kk] => {
-                println!("0x{:X}", get_value(kk, &state));
-            },
-            ["oprint", kk] => {
-                println!("0o{:o}", get_value(kk, &state));
-            }
+            ["print"] => { println!("{:?}", state) },
+            ["print", kk] => { println!("{}", get_value(kk, &state)); },
+            ["bprint", kk] => { println!("0b{:b}", get_value(kk, &state)) },
+            ["xprint", kk] => { println!("0x{:X}", get_value(kk, &state)) },
+            ["oprint", kk] => { println!("0o{:o}", get_value(kk, &state)) }
 
             // Arithmetic
             ["add", kk, kx, ky] => {
@@ -135,7 +148,7 @@ fn main() {
                 println!("Updated state: {:?}", state);
             },
             ["sub", kk, kx, ky] => {
-                println!("add {} {} {}", kk, kx, ky);
+                println!("sub {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
                     get_value(kx, &state) - get_value(ky, &state)
@@ -143,7 +156,7 @@ fn main() {
                 println!("Updated state: {:?}", state);
             },
             ["mul", kk, kx, ky] => {
-                println!("add {} {} {}", kk, kx, ky);
+                println!("mul {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
                     get_value(kx, &state) * get_value(ky, &state)
@@ -151,7 +164,7 @@ fn main() {
                 println!("Updated state: {:?}", state);
             },
             ["div", kk, kx, ky] => {
-                println!("add {} {} {}", kk, kx, ky);
+                println!("div {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
                     get_value(kx, &state) / get_value(ky, &state)
@@ -182,7 +195,11 @@ Basic idea:
 
 TODOs:
 
-- Implement "Number" over i64, f64
+- ~~Implement "Number" over i64, f64~~
+
+- ~~Implement parsing Number from string~~
+
+- Change `state` to `Number`, parse `Number` from string...
 
 - Implement all non-jumping instructions. (interactive input)
 // Arithmetic: add sub mul div
