@@ -64,7 +64,6 @@ impl Add for Number {
     }
 }
 
-
 impl From<&str> for Number {
     fn from(ss: &str) -> Self {
         if let Ok(vv) = ss.parse::<i64>() {
@@ -90,27 +89,6 @@ impl From<String> for Number {
         }
     }
 }
-
-fn _debug_add_main() {
-    // yessss
-    println!("{:?}", Number::from(1));
-    println!("{:?}", Number::from(3.14));
-    println!("{:?}", Number::from(1)   + Number::from(1));
-    println!("{:?}", Number::from(1.0) + Number::from(1));
-    println!("{:?}", Number::from(1)   + Number::from(1.0));
-    println!("{:?}", Number::from(1.0) + Number::from(1.0));
-}
-
-fn _debug_from_string() {
-    // YESSSSSSSS
-    println!("{:?}", Number::from("1"));
-    println!("{:?}", Number::from("3.14"));
-    println!("{:?}", Number::from("1")   + Number::from("1"));
-    println!("{:?}", Number::from("1.0") + Number::from("1"));
-    println!("{:?}", Number::from("1")   + Number::from("1.0"));
-    println!("{:?}", Number::from("1.0") + Number::from("1.0"));
-}
-
 fn get_value(
     token: &str,
     state: &HashMap<String, Number>
@@ -203,29 +181,13 @@ fn main() {
             },
             _ => println!("{:?}", input_tokens),
         }
+    
+    idx += 1;
     }
 }
+
 /*
-
-Basic idea:
-
-- Program stores:
-    - Instructions list
-    - Index of instruction
-    - Variable hashmap
-        - Values are numbers
-        - Arb precision!
-        - Labels to jump to are just variables
-    - Metadata:
-        - Cycle count
-
 TODOs:
-
-- ~~Implement "Number" over i64, f64~~
-
-- ~~Implement parsing Number from string~~
-
-- Change `state` to `Number`, parse `Number` from string...
 
 - Implement all non-jumping instructions. (interactive input)
 // Arithmetic: add sub mul div
@@ -241,10 +203,26 @@ TODOs:
     - But now we have a list of instructions...
     - Tokenize and store in list
 
-- Implement jumping instructions
 
-- Implement some programs...
+Big things:
 
+- Metadata (cycle count)
+- Conditions and branches
+- Arrays
+- Basic programs
+- Instructions from stdin. (let someone file > program)
+    - Instruction index
 - Arb precision
+- To Wasm
+- Webpage IDE
+- honestly i should learn rust tdd
+
+DONEs:
+- Implement set, state on i64
+- Implement add, etc. on i64
+- Implement "Number" over i64, f64
+- Implement parsing Number from string
+- Change get state
+
 
 */
