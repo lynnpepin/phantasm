@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use std::io::{stdin, stdout, Write};
 use std::ops::{Add, Sub, Mul, Div};
+use std::fmt;
 
 
 // Get input string from stdin
@@ -22,10 +23,19 @@ fn input() -> String {
 }
 
 // Dynamic-typed number
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Number {
     F64(f64),
     I64(i64),
+}
+
+impl fmt::Display for Number {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Number::I64(val) => val.fmt(f),
+            Number::F64(val) => val.fmt(f),
+        }
+    }
 }
 
 // todo: n identical `impl` for n types. i must learn macros
@@ -68,14 +78,26 @@ impl From<&str> for Number {
     }
 }
 
+impl From<String> for Number {
+    fn from(ss: String) -> Self {
+        if let Ok(vv) = ss.parse::<i64>() {
+            Number::I64(vv)
+        } else if let Ok(vv) = ss.parse::<f64>() {
+            Number::F64(vv)
+        } else {
+            // todo: do something other than panic
+            panic!("yeah i didn't think that would work either");
+        }
+    }
+}
 
 fn _debug_add_main() {
     // yessss
     println!("{:?}", Number::from(1));
     println!("{:?}", Number::from(3.14));
-    println!("{:?}", Number::from(1) + Number::from(1));
+    println!("{:?}", Number::from(1)   + Number::from(1));
     println!("{:?}", Number::from(1.0) + Number::from(1));
-    println!("{:?}", Number::from(1) + Number::from(1.0));
+    println!("{:?}", Number::from(1)   + Number::from(1.0));
     println!("{:?}", Number::from(1.0) + Number::from(1.0));
 }
 
@@ -83,35 +105,36 @@ fn _debug_from_string() {
     // YESSSSSSSS
     println!("{:?}", Number::from("1"));
     println!("{:?}", Number::from("3.14"));
-    println!("{:?}", Number::from("1") + Number::from("1"));
+    println!("{:?}", Number::from("1")   + Number::from("1"));
     println!("{:?}", Number::from("1.0") + Number::from("1"));
-    println!("{:?}", Number::from("1") + Number::from("1.0"));
+    println!("{:?}", Number::from("1")   + Number::from("1.0"));
     println!("{:?}", Number::from("1.0") + Number::from("1.0"));
 }
 
-
 fn get_value(
     token: &str,
-    state: &HashMap<String, i64>
-) -> i64 {
-    // Parse token as i64 if possible
-    // Else, look up in state
-    match token.parse::<i64>() {
-        Ok(value) => value,
-        Err(_) => *state.get(token).unwrap_or(&0)
+    state: &HashMap<String, Number>
+) -> Option<Number> {
+    if let Ok(val) = token.parse::<i64>() {
+        Some(Number::I64(val))
+    } else if let Ok(val) = token.parse::<f64>() {
+        Some(Number::F64(val))
+    } else {
+        state.get(token).cloned()
     }
 }
 
 
 
-fn notmain() {
+
+fn main() {
     // Store instructions (list of str), instruction index, state (variable hashmap)
     // Instructions: List of string representing pseudo-ASM instructions
     let mut instructions: Vec<String> = Vec::new();
     // Instruction index: Represents the currently running instruction
     let mut idx: usize = 0;
     // State: Variable hashmap of String key to i64 value
-    let mut state: HashMap<String, i64> = HashMap::new();
+    let mut state: HashMap<String, Number> = HashMap::new();
 
 
     loop {
@@ -124,7 +147,7 @@ fn notmain() {
             // Directly manipulate and view state
             ["set", kk, vv] => {
                 println!("set {} = {}", kk, vv);
-                state.insert(kk.to_string(), vv.parse::<i64>().expect("Not a number"));
+                state.insert(kk.to_string(), Number::from(vv.to_string()));
                 println!("Updated state: {:?}", state)
             },
             ["del", kk] => {
@@ -133,20 +156,22 @@ fn notmain() {
                 println!("Updated state: {:?}", state)
             },
             ["print"] => { println!("{:?}", state) },
-            ["print", kk] => { println!("{}", get_value(kk, &state)); },
-            ["bprint", kk] => { println!("0b{:b}", get_value(kk, &state)) },
-            ["xprint", kk] => { println!("0x{:X}", get_value(kk, &state)) },
-            ["oprint", kk] => { println!("0o{:o}", get_value(kk, &state)) }
+            ["print", kk] => { println!("{:?}", get_value(kk, &state)); },
+            // todo: need to figure out how to just derive all of these from primitive
+            //["bprint", kk] => { println!("0b{:b}", get_value(kk, &state)) },
+            //["xprint", kk] => { println!("0x{:X}", get_value(kk, &state)) },
+            //["oprint", kk] => { println!("0o{:o}", get_value(kk, &state)) }
 
             // Arithmetic
             ["add", kk, kx, ky] => {
                 println!("add {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
-                    get_value(kx, &state) + get_value(ky, &state)
+                    get_value(kx, &state).unwrap() + get_value(ky, &state).unwrap()
                 );
                 println!("Updated state: {:?}", state);
             },
+            /*
             ["sub", kk, kx, ky] => {
                 println!("sub {} {} {}", kk, kx, ky);
                 state.insert(
@@ -171,6 +196,7 @@ fn notmain() {
                 );
                 println!("Updated state: {:?}", state);
             },
+            */
             ["exit"] => {
                 println!("exit");
                 break;
