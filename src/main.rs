@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 use std::io::{stdin, stdout, Write};
+use std::ops::{Add, Sub, Mul, Div};
 
 
+// Get input string from stdin
 fn input() -> String {
     let mut ss = String::new();
     // Ensure chars get printed before the prompt
@@ -19,11 +21,54 @@ fn input() -> String {
     ss
 }
 
+// Dynamic-typed number
+#[derive(Debug)]
+enum Number {
+    F64(f64),
+    I64(i64),
+}
+
+// todo: n identical `impl` for n types. i must learn macros
+impl From<i64> for Number {
+    fn from(item: i64) -> Self {
+        Number::I64(item)
+    }
+}
+
+impl From<f64> for Number {
+    fn from(item: f64) -> Self {
+        Number::F64(item)
+    }
+}
+
+impl Add for Number {
+    type Output = Number;
+    fn add(self, other: Number) -> Number {
+        match (self, other) {
+            // todo: 2^n lines for n types, figure out a better way
+            (Number::I64(a), Number::I64(b)) => Number::I64(a + b),
+            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 + b),
+            (Number::F64(a), Number::I64(b)) => Number::F64(a + b as f64),
+            (Number::F64(a), Number::F64(b)) => Number::F64(a + b),
+        }
+    }
+}
+
+fn _debug_add_main() {
+    // yessss
+    println!("{:?}", Number::from(1));
+    println!("{:?}", Number::from(3.14));
+    println!("{:?}", Number::from(1) + Number::from(1));
+    println!("{:?}", Number::from(1.0) + Number::from(1));
+    println!("{:?}", Number::from(1) + Number::from(1.0));
+    println!("{:?}", Number::from(1.0) + Number::from(1.0));
+}
+
+
 /* Phantasm numbers are currently just i64...
 
 Soon, implement enum Number {i64, f64, arbitrary precision), etc.
 */
-
 fn get_value(
     token: &str,
     state: &HashMap<String, i64>
@@ -137,6 +182,8 @@ Basic idea:
 
 TODOs:
 
+- Implement "Number" over i64, f64
+
 - Implement all non-jumping instructions. (interactive input)
 // Arithmetic: add sub mul div
 // Logic:      and, or, xor, not
@@ -144,6 +191,7 @@ TODOs:
 // Conditions: eq, ne, lt, gt, leq, geq
 // Bitwise:    shl, shr, rol, ror
 // Control flow: label, jump
+// Comments! 
 
 - Get instructions from stdin.
     - No more interactive input!
