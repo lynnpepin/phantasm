@@ -64,6 +64,48 @@ impl Add for Number {
     }
 }
 
+impl Sub for Number {
+    type Output = Number;
+    fn sub(self, other: Number) -> Number {
+        match (self, other) {
+            // Could probably re-use add, but
+            // 1. I don't know how to
+            // 2. I don't know if (a - b) == (a + -b) will be true in all primitives when we add arb prec
+            (Number::I64(a), Number::I64(b)) => Number::I64(a - b),
+            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 - b),
+            (Number::F64(a), Number::I64(b)) => Number::F64(a - b as f64),
+            (Number::F64(a), Number::F64(b)) => Number::F64(a - b),
+        }
+    }
+}
+
+impl Mul for Number {
+    type Output = Number;
+    fn mul(self, other: Number) -> Number {
+        match (self, other) {
+            (Number::I64(a), Number::I64(b)) => Number::I64(a * b),
+            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 * b),
+            (Number::F64(a), Number::I64(b)) => Number::F64(a * b as f64),
+            (Number::F64(a), Number::F64(b)) => Number::F64(a * b),
+        }
+    }
+}
+
+impl Div for Number {
+    type Output = Number;
+    fn div(self, other: Number) -> Number {
+        // Could be a oneliner by a better rustacean
+        // and I am so sleepy
+        match (self, other) {
+            (Number::I64(a), Number::I64(b)) => Number::F64(a as f64 / b as f64),
+            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 / b),
+            (Number::F64(a), Number::I64(b)) => Number::F64(a / b as f64),
+            (Number::F64(a), Number::F64(b)) => Number::F64(a / b),
+        }
+    }
+}
+
+
 impl From<&str> for Number {
     fn from(ss: &str) -> Self {
         if let Ok(vv) = ss.parse::<i64>() {
@@ -141,6 +183,7 @@ fn main() {
             //["oprint", kk] => { println!("0o{:o}", get_value(kk, &state)) }
 
             // Arithmetic
+            // (todo: consider ["add", kx, ky] to print for interactive?)
             ["add", kk, kx, ky] => {
                 println!("add {} {} {}", kk, kx, ky);
                 state.insert(
@@ -149,12 +192,11 @@ fn main() {
                 );
                 println!("Updated state: {:?}", state);
             },
-            /*
             ["sub", kk, kx, ky] => {
                 println!("sub {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
-                    get_value(kx, &state) - get_value(ky, &state)
+                    get_value(kx, &state).unwrap() - get_value(ky, &state).unwrap()
                 );
                 println!("Updated state: {:?}", state);
             },
@@ -162,7 +204,7 @@ fn main() {
                 println!("mul {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
-                    get_value(kx, &state) * get_value(ky, &state)
+                    get_value(kx, &state).unwrap() * get_value(ky, &state).unwrap()
                 );
                 println!("Updated state: {:?}", state);
             },
@@ -170,11 +212,10 @@ fn main() {
                 println!("div {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
-                    get_value(kx, &state) / get_value(ky, &state)
+                    get_value(kx, &state).unwrap() / get_value(ky, &state).unwrap()
                 );
                 println!("Updated state: {:?}", state);
             },
-            */
             ["exit"] => {
                 println!("exit");
                 break;
