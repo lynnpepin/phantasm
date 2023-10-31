@@ -18,6 +18,7 @@ impl fmt::Display for Number {
   }
 }
 
+// `impl from`
 // todo: n identical `impl` for n types. i must learn macros
 impl From<i64> for Number {
   fn from(item: i64) -> Self {
@@ -31,6 +32,37 @@ impl From<f64> for Number {
   }
 }
 
+impl TryFrom<String> for Number {
+  type Error = ();
+
+  fn try_from(ss: String) -> Result<Self, ()> {
+      if let Ok(vv) = ss.parse::<i64>() {
+          Ok(Number::I64(vv))
+      } else if let Ok(vv) = ss.parse::<f64>() {
+          Ok(Number::F64(vv))
+      } else {
+          Err(())
+      }
+  }
+}
+
+impl TryFrom<&str> for Number {
+  type Error = ();
+
+  fn try_from(ss: &str) -> Result<Self, ()> {
+      if let Ok(vv) = ss.parse::<i64>() {
+          Ok(Number::I64(vv))
+      } else if let Ok(vv) = ss.parse::<f64>() {
+          Ok(Number::F64(vv))
+      } else {
+          Err(())
+      }
+  }
+}
+
+
+
+// impl ops<
 impl Add for Number {
   type Output = Number;
   fn add(self, other: Number) -> Number {
@@ -128,32 +160,6 @@ impl Not for Number {
       match (self) {
           (Number::I64(a)) => Number::I64(!a),
           (Number::F64(a)) => Number::I64(!a.to_bits() as i64),
-      }
-  }
-}
-
-impl From<&str> for Number {
-  fn from(ss: &str) -> Self {
-      if let Ok(vv) = ss.parse::<i64>() {
-          Number::I64(vv)
-      } else if let Ok(vv) = ss.parse::<f64>() {
-          Number::F64(vv)
-      } else {
-          // todo: do something other than panic
-          panic!("yeah i didn't think that would work either");
-      }
-  }
-}
-
-impl From<String> for Number {
-  fn from(ss: String) -> Self {
-      if let Ok(vv) = ss.parse::<i64>() {
-          Number::I64(vv)
-      } else if let Ok(vv) = ss.parse::<f64>() {
-          Number::F64(vv)
-      } else {
-          // todo: do something other than panic
-          panic!("yeah i didn't think that would work either");
       }
   }
 }
