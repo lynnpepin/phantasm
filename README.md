@@ -54,10 +54,10 @@ Operators:
   - ` or k x y`
   - `xor k x y`
   - `not k x`
-
-TODO:
-
-- **
+- Later TODO:
+  - **Other bitwise ops:**  `shl, shr, rol, ror`
+  - **Math ops:** TODO, `round`, `floor,` `ceil`, `float`
+  - **Cooler arithmetic operators:** Pow, log, float, and constants like `e`, `pi`, even `i`. Imagine.
 
 ---
 

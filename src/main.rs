@@ -1,8 +1,19 @@
 use std::collections::HashMap;
 use std::io::{stdin, stdout, Write};
-use std::ops::{Add, Sub, Mul, Div, BitAnd, BitOr, BitXor, Not, Shl, Shr};
-use std::fmt;
+mod number;
+use number::Number;
 
+/*
+todo: Implement array
+
+0. Document reading array as `key.index`
+1. `get_value` tries I64, then F64, then key.index as state[key][index], then state[key][0]
+2. `set_value` for key -> [val,]
+3. `set_value` for key -> [val1, val2, val3, ...]
+4. `set_value` for key.index
+5. Common datastructure functions: Push, pop, len, queue, dequeue, etc.
+
+*/
 
 // Get input string from stdin
 fn input() -> String {
@@ -22,178 +33,34 @@ fn input() -> String {
     ss
 }
 
-// Dynamic-typed number
-#[derive(Debug, Clone)]
-enum Number {
-    F64(f64),
-    I64(i64),
-}
-
-impl fmt::Display for Number {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Number::I64(val) => val.fmt(f),
-            Number::F64(val) => val.fmt(f),
-        }
-    }
-}
-
-// todo: n identical `impl` for n types. i must learn macros
-impl From<i64> for Number {
-    fn from(item: i64) -> Self {
-        Number::I64(item)
-    }
-}
-
-impl From<f64> for Number {
-    fn from(item: f64) -> Self {
-        Number::F64(item)
-    }
-}
-
-impl Add for Number {
-    type Output = Number;
-    fn add(self, other: Number) -> Number {
-        match (self, other) {
-            // todo: 2^n lines for n types, figure out a better way
-            (Number::I64(a), Number::I64(b)) => Number::I64(a + b),
-            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 + b),
-            (Number::F64(a), Number::I64(b)) => Number::F64(a + b as f64),
-            (Number::F64(a), Number::F64(b)) => Number::F64(a + b),
-        }
-    }
-}
-
-impl Sub for Number {
-    type Output = Number;
-    fn sub(self, other: Number) -> Number {
-        match (self, other) {
-            // Could probably re-use add, but
-            // 1. I don't know how to
-            // 2. I don't know if (a - b) == (a + -b) will be true in all primitives when we add arb prec
-            (Number::I64(a), Number::I64(b)) => Number::I64(a - b),
-            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 - b),
-            (Number::F64(a), Number::I64(b)) => Number::F64(a - b as f64),
-            (Number::F64(a), Number::F64(b)) => Number::F64(a - b),
-        }
-    }
-}
-
-impl Mul for Number {
-    type Output = Number;
-    fn mul(self, other: Number) -> Number {
-        match (self, other) {
-            (Number::I64(a), Number::I64(b)) => Number::I64(a * b),
-            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 * b),
-            (Number::F64(a), Number::I64(b)) => Number::F64(a * b as f64),
-            (Number::F64(a), Number::F64(b)) => Number::F64(a * b),
-        }
-    }
-}
-
-impl Div for Number {
-    type Output = Number;
-    fn div(self, other: Number) -> Number {
-        // Could be a oneliner by a better rustacean
-        // and I am so sleepy
-        match (self, other) {
-            (Number::I64(a), Number::I64(b)) => Number::F64(a as f64 / b as f64),
-            (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 / b),
-            (Number::F64(a), Number::I64(b)) => Number::F64(a / b as f64),
-            (Number::F64(a), Number::F64(b)) => Number::F64(a / b),
-        }
-    }
-}
-
-impl BitAnd for Number {
-    type Output = Number;
-    fn bitand(self, other: Number) -> Number {
-        match (self, other) {
-            (Number::I64(a), Number::I64(b)) => Number::I64(a & b),
-            // i64 as u64: -1 becomes 2^64 - 1, not panic
-            (Number::I64(a), Number::F64(b)) => Number::I64((a as u64    & b.to_bits()) as i64),
-            (Number::F64(a), Number::I64(b)) => Number::I64((a.to_bits() & b as u64) as i64),
-            (Number::F64(a), Number::F64(b)) => Number::I64((a.to_bits() & b.to_bits()) as i64),
-        }
-    }
-}
-
-impl BitOr for Number {
-    type Output = Number;
-    fn bitor(self, other: Number) -> Number {
-        match (self, other) {
-            (Number::I64(a), Number::I64(b)) => Number::I64(a | b),
-            (Number::I64(a), Number::F64(b)) => Number::I64((a as u64    | b.to_bits()) as i64),
-            (Number::F64(a), Number::I64(b)) => Number::I64((a.to_bits() | b as u64) as i64),
-            (Number::F64(a), Number::F64(b)) => Number::I64((a.to_bits() | b.to_bits()) as i64),
-        }
-    }
-}
-
-impl BitXor for Number {
-    type Output = Number;
-    fn bitxor(self, other: Number) -> Number {
-        match (self, other) {
-            (Number::I64(a), Number::I64(b)) => Number::I64(a ^ b),
-            (Number::I64(a), Number::F64(b)) => Number::I64((a as u64    ^ b.to_bits()) as i64),
-            (Number::F64(a), Number::I64(b)) => Number::I64((a.to_bits() ^ b as u64) as i64),
-            (Number::F64(a), Number::F64(b)) => Number::I64((a.to_bits() ^ b.to_bits()) as i64),
-        }
-    }
-}
-
-impl Not for Number {
-    type Output = Number;
-    fn not(self) -> Number {
-        match (self) {
-            (Number::I64(a)) => Number::I64(!a),
-            (Number::F64(a)) => Number::I64(!a.to_bits() as i64),
-        }
-    }
-}
-
-
-
-impl From<&str> for Number {
-    fn from(ss: &str) -> Self {
-        if let Ok(vv) = ss.parse::<i64>() {
-            Number::I64(vv)
-        } else if let Ok(vv) = ss.parse::<f64>() {
-            Number::F64(vv)
-        } else {
-            // todo: do something other than panic
-            panic!("yeah i didn't think that would work either");
-        }
-    }
-}
-
-impl From<String> for Number {
-    fn from(ss: String) -> Self {
-        if let Ok(vv) = ss.parse::<i64>() {
-            Number::I64(vv)
-        } else if let Ok(vv) = ss.parse::<f64>() {
-            Number::F64(vv)
-        } else {
-            // todo: do something other than panic
-            panic!("yeah i didn't think that would work either");
-        }
-    }
-}
 fn get_value(
     token: &str,
-    state: &HashMap<String, Number>
-) -> Option<Number> {
+    state: &HashMap<String, Vec<Number>>
+  ) -> Option<Number> {
     if let Ok(val) = token.parse::<i64>() {
         Some(Number::I64(val))
     } else if let Ok(val) = token.parse::<f64>() {
         Some(Number::F64(val))
     } else {
-        state.get(token).cloned()
+        // Read "and then" as "and then, if that works,"
+        // Split token into key.index
+        token.split_once('.').and_then(
+            // Parse `idx` as an index
+            |(key, idx)| idx.parse::<usize>().ok().and_then(
+                // Get the vec from state[key]
+                |idx| state.get(key).and_then(
+                    // Get vec[idx]
+                    |vec| vec.get(idx))
+                )
+            ).cloned()
+        .or_else(
+            || state.get(token).and_then(|vec| vec.get(0)).cloned()
+        )
     }
 }
 
 
-
+  
 
 fn main() {
     // Store instructions (list of str), instruction index, state (variable hashmap)
@@ -202,7 +69,7 @@ fn main() {
     // Instruction index: Represents the currently running instruction
     let mut idx: usize = 0;
     // State: Variable hashmap of String key to i64 value
-    let mut state: HashMap<String, Number> = HashMap::new();
+    let mut state: HashMap<String, Vec<Number>> = HashMap::new();
 
 
     loop {
@@ -214,7 +81,12 @@ fn main() {
         match input_tokens.as_slice() {
             // Directly manipulate and view state
             ["set", kk, vv] => {
-                state.insert(kk.to_string(), Number::from(vv.to_string()));
+                //state.insert(kk.to_string(), Number::from(vv.to_string()));
+                // But we want Vec<Number> not Number, so:
+                state.insert(kk.to_string(), vec![Number::from(vv.to_string())]);
+                // todo: update this and below to allow kk of format kk[index]
+
+
             },
             ["del", kk] => {
                 state.remove(&kk.to_string());
@@ -290,6 +162,10 @@ fn main() {
 
 /*
 TODOs:
+
+- Implement `array`
+    - Indexed list of numbers stored in `state`
+- Implement `input`
 
 - Implement all non-jumping instructions. (interactive input)
 // Arithmetic: add sub mul div
