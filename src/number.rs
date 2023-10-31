@@ -2,7 +2,7 @@ use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, BitAnd, BitOr, BitXor, Not, Shl, Shr};
 
 // Dynamic-typed number
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub enum Number {
     F64(f64),
     I64(i64),
