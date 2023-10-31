@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 use std::io::{stdin, stdout, Write};
-use std::ops::{Add, Sub, Mul, Div};
+use std::ops::{Add, Sub, Mul, Div, BitAnd, BitOr, BitXor, Not, Shl, Shr};
 use std::fmt;
 
 
@@ -105,6 +105,54 @@ impl Div for Number {
     }
 }
 
+impl BitAnd for Number {
+    type Output = Number;
+    fn bitand(self, other: Number) -> Number {
+        match (self, other) {
+            (Number::I64(a), Number::I64(b)) => Number::I64(a & b),
+            // i64 as u64: -1 becomes 2^64 - 1, not panic
+            (Number::I64(a), Number::F64(b)) => Number::I64((a as u64    & b.to_bits()) as i64),
+            (Number::F64(a), Number::I64(b)) => Number::I64((a.to_bits() & b as u64) as i64),
+            (Number::F64(a), Number::F64(b)) => Number::I64((a.to_bits() & b.to_bits()) as i64),
+        }
+    }
+}
+
+impl BitOr for Number {
+    type Output = Number;
+    fn bitor(self, other: Number) -> Number {
+        match (self, other) {
+            (Number::I64(a), Number::I64(b)) => Number::I64(a | b),
+            (Number::I64(a), Number::F64(b)) => Number::I64((a as u64    | b.to_bits()) as i64),
+            (Number::F64(a), Number::I64(b)) => Number::I64((a.to_bits() | b as u64) as i64),
+            (Number::F64(a), Number::F64(b)) => Number::I64((a.to_bits() | b.to_bits()) as i64),
+        }
+    }
+}
+
+impl BitXor for Number {
+    type Output = Number;
+    fn bitxor(self, other: Number) -> Number {
+        match (self, other) {
+            (Number::I64(a), Number::I64(b)) => Number::I64(a ^ b),
+            (Number::I64(a), Number::F64(b)) => Number::I64((a as u64    ^ b.to_bits()) as i64),
+            (Number::F64(a), Number::I64(b)) => Number::I64((a.to_bits() ^ b as u64) as i64),
+            (Number::F64(a), Number::F64(b)) => Number::I64((a.to_bits() ^ b.to_bits()) as i64),
+        }
+    }
+}
+
+impl Not for Number {
+    type Output = Number;
+    fn not(self) -> Number {
+        match (self) {
+            (Number::I64(a)) => Number::I64(!a),
+            (Number::F64(a)) => Number::I64(!a.to_bits() as i64),
+        }
+    }
+}
+
+
 
 impl From<&str> for Number {
     fn from(ss: &str) -> Self {
@@ -166,14 +214,10 @@ fn main() {
         match input_tokens.as_slice() {
             // Directly manipulate and view state
             ["set", kk, vv] => {
-                println!("set {} = {}", kk, vv);
                 state.insert(kk.to_string(), Number::from(vv.to_string()));
-                println!("Updated state: {:?}", state)
             },
             ["del", kk] => {
-                println!("del {}", kk);
                 state.remove(&kk.to_string());
-                println!("Updated state: {:?}", state)
             },
             ["print"] => { println!("{:?}", state) },
             ["print", kk] => { println!("{:?}", get_value(kk, &state)); },
@@ -185,36 +229,52 @@ fn main() {
             // Arithmetic
             // (todo: consider ["add", kx, ky] to print for interactive?)
             ["add", kk, kx, ky] => {
-                println!("add {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
                     get_value(kx, &state).unwrap() + get_value(ky, &state).unwrap()
                 );
-                println!("Updated state: {:?}", state);
             },
             ["sub", kk, kx, ky] => {
-                println!("sub {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
                     get_value(kx, &state).unwrap() - get_value(ky, &state).unwrap()
                 );
-                println!("Updated state: {:?}", state);
             },
             ["mul", kk, kx, ky] => {
-                println!("mul {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
                     get_value(kx, &state).unwrap() * get_value(ky, &state).unwrap()
                 );
-                println!("Updated state: {:?}", state);
             },
             ["div", kk, kx, ky] => {
-                println!("div {} {} {}", kk, kx, ky);
                 state.insert(
                     kk.to_string(),
                     get_value(kx, &state).unwrap() / get_value(ky, &state).unwrap()
                 );
-                println!("Updated state: {:?}", state);
+            },
+            ["and", kk, kx, ky] => {
+                state.insert(
+                    kk.to_string(),
+                    get_value(kx, &state).unwrap() & get_value(ky, &state).unwrap()
+                );
+            },
+            ["or", kk, kx, ky] => {
+                state.insert(
+                    kk.to_string(),
+                    get_value(kx, &state).unwrap() | get_value(ky, &state).unwrap()
+                );
+            },
+            ["xor", kk, kx, ky] => {
+                state.insert(
+                    kk.to_string(),
+                    get_value(kx, &state).unwrap() ^ get_value(ky, &state).unwrap()
+                );
+            },
+            ["not", kk, kx] => {
+                state.insert(
+                    kk.to_string(),
+                    !get_value(kx, &state).unwrap()
+                );
             },
             ["exit"] => {
                 println!("exit");
@@ -222,7 +282,8 @@ fn main() {
             },
             _ => println!("{:?}", input_tokens),
         }
-    
+
+    println!("Updated state: {:?}", state);
     idx += 1;
     }
 }

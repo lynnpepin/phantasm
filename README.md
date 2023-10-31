@@ -41,4 +41,24 @@ Turns out Phantasm is the name of a famous horror movie... And hey, this is an i
 
 ---
 
+Operators:
+
+- **Arithmetic** operators cast to float when necessary:
+  - `add k x y`
+  - `sub k x y`
+  - `mul k x y`
+  - `div k x y` always casts to float.
+    - Use `div k k 1` to convert `k` from int to float.
+- **Bitwise operators** always cast to int.
+  - `and k x y`
+  - ` or k x y`
+  - `xor k x y`
+  - `not k x`
+
+TODO:
+
+- **
+
+---
+
 This language is named after "Penumbra Phantasm", a long-sought after Homestuck song by Toby Fox. It was never released in full, but its instrumentation and melody is referenced in many tracks. It's kind of a "white whale" for Homestuck music fans. Most importantly, the word ends in "asm". You can read about Penumbra Phantasm [on the Homestuck Music Wiki](https://hsmusic.wiki/track/penumbra-phantasm/), listen to [the archived 2012 livestream version](https://www.youtube.com/watch?v=RIq4GrMv96I), or the partial [Homestuck Soundtest version](https://www.youtube.com/watch?v=OdntMzdkFnk).
