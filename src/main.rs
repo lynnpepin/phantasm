@@ -5,6 +5,8 @@ use number::Number;
 mod array;
 use array::{parse_numbers, get_value_from_state, get_value, set_value};
 
+use crate::array::set_value_in_state;
+
 // Get input string from stdin
 fn input() -> String {
   let mut ss = String::new();
@@ -48,9 +50,8 @@ fn main() {
       ["del", kk] => {
         state.remove(&kk.to_string());
       },
-      /*
       ["print"] => { println!("{:?}", state) },
-      ["print", kk] => { println!("{:?}", get_value(kk, &state)); },
+      ["print", kk] => { println!("{:?}", get_value(kk.to_string(), &mut state)); },
       // todo: need to figure out how to just derive all of these from primitive
       //["bprint", kk] => { println!("0b{:b}", get_value(kk, &state)) },
       //["xprint", kk] => { println!("0x{:X}", get_value(kk, &state)) },
@@ -59,11 +60,16 @@ fn main() {
       // Arithmetic
       // (todo: consider ["add", kx, ky] to print for interactive?)
       ["add", kk, kx, ky] => {
-        state.insert(
+        let vx = get_value(kx.to_string(), &mut state).unwrap();
+        let vy = get_value(ky.to_string(), &mut state).unwrap();
+        set_value_in_state(
+          &mut state,
           kk.to_string(),
-          get_value(kx, &state).unwrap() + get_value(ky, &state).unwrap()
+          None,
+          vec![vx + vy]
         );
       },
+      /*
       ["sub", kk, kx, ky] => {
         state.insert(
           kk.to_string(),

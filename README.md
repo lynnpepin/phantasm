@@ -64,3 +64,14 @@ Operators:
 ---
 
 This language is named after "Penumbra Phantasm", a long-sought after Homestuck song by Toby Fox. It was never released in full, but its instrumentation and melody is referenced in many tracks. It's kind of a "white whale" for Homestuck music fans. Most importantly, the word ends in "asm". You can read about Penumbra Phantasm [on the Homestuck Music Wiki](https://hsmusic.wiki/track/penumbra-phantasm/), listen to [the archived 2012 livestream version](https://www.youtube.com/watch?v=RIq4GrMv96I), or the partial [Homestuck Soundtest version](https://www.youtube.com/watch?v=OdntMzdkFnk).
+
+---
+
+Some tests:
+
+```
+set x 0,1.0,2.0,3.0
+set y 0,10,20,30,40
+add z x.3 y.4
+# expect z = [F64(43.0)]
+```

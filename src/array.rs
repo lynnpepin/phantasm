@@ -23,7 +23,7 @@ pub fn parse_numbers(ss: &String) -> Result<Vec<Number>, ()> {
 
 // Helper func for state[key][idx]
 pub fn get_value_from_state(
-  state: &HashMap<String, Vec<Number>>,
+  state: &mut HashMap<String, Vec<Number>>,
   key: String,
   idx: Option<usize>, 
 ) -> Result<Number, ()> {
@@ -36,7 +36,7 @@ pub fn get_value_from_state(
 // Interpret value as literal or variable embedded in state
 // e.g. get_value(kk, state) -> 3, or get_value(kk.0, state) -> 3, or get_value(ll.4, state) -> 1.414
 pub fn get_value(
-  token: String, state: &HashMap<String, Vec<Number>>
+  token: String, state: &mut HashMap<String, Vec<Number>>
 ) -> Result<Number, ()> {
   /*
   Helper function to read token from state.
