@@ -22,7 +22,7 @@ fn input() -> String {
 }
 
 // Parse comma-separated string to numbers
-fn parse_numbers(ss: String) -> Result<Vec<Number>, ()> {
+fn parse_numbers(ss: &String) -> Result<Vec<Number>, ()> {
   //Helper function to parse a comma-separated list of numbers
   // If any of the numbers fail to parse, return Err ()
   // Todo: Clean this up, better E
@@ -33,7 +33,8 @@ fn parse_numbers(ss: String) -> Result<Vec<Number>, ()> {
     } else if let Ok(num) = token.parse::<f64>() {
       vec.push(Number::F64(num));
     } else {
-      return Err(());
+      println!("Could not parse {} as number", token);
+      return Err(())
     }
   }
   Ok(vec)
@@ -79,7 +80,10 @@ fn get_value(
     if let Some((key, index_str)) = token.split_once('.') {
       match get_value_from_state(state, key.to_string(), index_str.parse::<usize>().ok()) {
         Ok(num) => Ok(num),
-        Err(_) => Err(()), // todo: Consider handling this case without just returning Err
+        Err(_) => {
+          println!("Could not parse token {} in get_value call", token);
+          Err(())
+        }
       }
     } else {
       get_value_from_state(state, token, None)
@@ -124,7 +128,7 @@ fn set_value_in_state(
   yields state["foo"] = [0, 10, 20, 1, 2, 3, 4, 5]
   */
   let index = idx.unwrap_or(0);
-  
+  println!("set_value_in_state({}, {}, {:?})", key, index, values);
   match state.get_mut(&key) {
     // state[key] exists; update it
     Some(vec) => {
@@ -177,10 +181,13 @@ fn set_value(
   
   Should probably be `Option<>` or something
   */
-  match parse_numbers(token) {
+  println!("set_value({}, {})", token, value);
+  match parse_numbers(&token) {
     Ok(values) => {
+      println!(".. values: {:?}", values);
       match token.split_once('.') {
         Some((key, index_str)) => {
+          println!(".. .. key: {}, index_str: {}", key, index_str);
           match index_str.parse::<usize>() {
             Ok(idx) => {
               set_value_in_state(
@@ -192,7 +199,7 @@ fn set_value(
               Ok(())
             },
             Err(ParseIntError) => {
-              // Error is "Could not parse index in set_value call", but return is Result<(), String>, so:
+              println!("Could not parse {} in set_value call", index_str);
               Err("Could not parse index in set_value call")
             }
             
@@ -201,7 +208,10 @@ fn set_value(
         // Handle the cases 2, 3
         None => {
           match values.len() {
-            0 => {Err("Could not parse empty values")},
+            0 => {
+              println!("Could not parse empty values");
+              Err("Could not parse empty values")
+            },
             _ => {
               state.insert(
                 token.to_string(),
@@ -213,7 +223,10 @@ fn set_value(
         }
       }
     },
-    Err(_) => { Err("Could not parse values in set_value call") },
+    Err(_) => {
+      println!("Could not parse values in set_value call");
+      Err("Could not parse values in set_value call")
+    },
   }
 }
 
