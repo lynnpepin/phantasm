@@ -6,12 +6,11 @@ use number::Number;
 /*
 todo: Implement array
 
-0. Document reading array as `key.index`
-1. `get_value` tries I64, then F64, then key.index as state[key][index], then state[key][0]
-2. `set_value` for key -> [val,]
-3. `set_value` for key -> [val1, val2, val3, ...]
-4. `set_value` for key.index
-5. Common datastructure functions: Push, pop, len, queue, dequeue, etc.
+1. Take number-parsing out of get_value
+    - &str -> Vec<Number>
+    - Can be a single value or a comma-separated list
+2. Rewrite get_value
+3. Finish set_value
 
 */
 
@@ -33,10 +32,22 @@ fn input() -> String {
     ss
 }
 
+// Get value from state
 fn get_value(
     token: &str,
     state: &HashMap<String, Vec<Number>>
   ) -> Option<Number> {
+    /*
+    Helper function to read token from state.
+    `token` can be one of:
+        1. Literal, does not touch state:
+            1. Parse as i64
+            2. Parse as f64
+        
+        2. Variable, stored in state:
+            1. key.idx, indexing array
+            2. key (same as key.0), reading a variable
+    */
     if let Ok(val) = token.parse::<i64>() {
         Some(Number::I64(val))
     } else if let Ok(val) = token.parse::<f64>() {
@@ -44,6 +55,7 @@ fn get_value(
     } else {
         // Read "and then" as "and then, if that works,"
         // Split token into key.index
+        // (todo: Handle case where idx > state[key]
         token.split_once('.').and_then(
             // Parse `idx` as an index
             |(key, idx)| idx.parse::<usize>().ok().and_then(
@@ -60,7 +72,70 @@ fn get_value(
 }
 
 
-  
+// no return type
+fn set_value(
+    token: &str,
+    value: Vec<Number>,
+    state: &HashMap<String, Vec<Number>>
+) -> () {
+    /*
+    Helper function to set state[token] = value
+    Four cases for token, value:
+    1. `key.idx, number`, i.e. state[key][index] = [number,]
+    2. `key
+
+
+    Three cases for token, value:
+    1. key.value, number:      state[token][value] = [number]
+    2. token, number:          state[token] = [number]
+    3. token, num1, num2, ...: state[token] = [num1, num2, ...]
+
+    Should probably be `Option<>` or something
+    */
+
+    // token = key.index_str
+    if let Some((key, index_str)) = token.split_once('.') {
+        
+        // token = key.index_str, and index_str is like u64
+        if let Ok(index) = index_str.parse::<usize>() {    
+
+            // state[key] exists. Set state[key][idx] = value, resizing if necessary
+            if let Some(vec) = state.get_mut(key) {
+                // todo: Handle >=1 value
+                if index >= vec.len() {
+                    // todo: what to do when value.len() > 1?
+                    vec.resize(
+                        index + 1,
+                        value.get(0).cloned().unwrap()
+                    );
+                } else {
+                    vec[index] = value.get(0).cloned().unwrap();
+                }
+            
+            // state[key] doesn't exist. Set state[key][index] = [value]
+            } else {
+                // Create new vector with length index + 1, value at index
+                /*
+                let mut vec: Vec<Number> = Vec::new();
+                vec.resize(index + 1, value.get(0).cloned().unwrap());
+                state.insert(key.to_string(), vec);
+                */
+                // oneliner hehe 
+                // todo: handle the case where [value] can be many
+                state.insert(
+                    key.to_string(),
+                    vec![value.get(0).cloned().unwrap(); index + 1]
+                );
+            }
+
+        // token = key.index_str, but index_str is not like u64
+        } else {
+            panic!("Couldn't set array value for some reason");
+        }
+    } else {
+    }
+}
+
 
 fn main() {
     // Store instructions (list of str), instruction index, state (variable hashmap)
@@ -167,14 +242,6 @@ TODOs:
     - Indexed list of numbers stored in `state`
 - Implement `input`
 
-- Implement all non-jumping instructions. (interactive input)
-// Arithmetic: add sub mul div
-// Logic:      and, or, xor, not
-// (Logic operators are bitwise)
-// Conditions: eq, ne, lt, gt, leq, geq
-// Bitwise:    shl, shr, rol, ror
-// Control flow: label, jump
-// Comments! 
 
 - Get instructions from stdin.
     - No more interactive input!
@@ -184,16 +251,22 @@ TODOs:
 
 Big things:
 
-- Metadata (cycle count)
-- Conditions and branches
+- Metadata (cycle count), PC in instructions
 - Arrays
+- Conditions and branches
 - Basic programs
 - Instructions from stdin. (let someone file > program)
     - Instruction index
+- Array float index
 - Arb precision
 - To Wasm
 - Webpage IDE
-- honestly i should learn rust tdd
+
+Longterm things:
+- No panics, proper error handling
+- Stricter grammar 
+- Proper compiler
+- Test driven dev
 
 DONEs:
 - Implement set, state on i64

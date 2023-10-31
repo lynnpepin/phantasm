@@ -55,9 +55,11 @@ Operators:
   - `xor k x y`
   - `not k x`
 - Later TODO:
+  - **Branching and jumps:** `label`, `jump`, `_pc`, `_cycles`
   - **Other bitwise ops:**  `shl, shr, rol, ror`
   - **Math ops:** TODO, `round`, `floor,` `ceil`, `float`
-  - **Cooler arithmetic operators:** Pow, log, float, and constants like `e`, `pi`, even `i`. Imagine.
+  - **Cooler arithmetic operators:** `pow`, `log`, `float`, and constants like `e`, `pi`, even `i`. Imagine.
+  - **Array ops:** `psh` (to end), `pop` (to end), `deq` (from start), `len`, `cat` (two arrays, or `cat val arr` to start)
 
 ---
 
