@@ -58,7 +58,6 @@ fn main() {
       //["oprint", kk] => { println!("0o{:o}", get_value(kk, &state)) }
       
       // Arithmetic
-      // (todo: consider ["add", kx, ky] to print for interactive?)
       ["add", kk, kx, ky] => {
         let vx = get_value(kx.to_string(), &mut state).unwrap();
         let vy = get_value(ky.to_string(), &mut state).unwrap();
@@ -68,6 +67,9 @@ fn main() {
           None,
           vec![vx + vy]
         );
+        // TODO: Handle something like add z.5 x.3 y.2
+        // Rename `set_value` to `set_value_from_string`
+        // Implement `set_value(dict, string, number)
       },
       /*
       ["sub", kk, kx, ky] => {
