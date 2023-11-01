@@ -23,7 +23,6 @@ fn input() -> String {
   ss
 }
 
-
 fn main() {
   // Store instructions (list of str), instruction index, state (variable hashmap)
   // Instructions: List of string representing pseudo-ASM instructions
@@ -55,63 +54,40 @@ fn main() {
       //["xprint", kk] => { println!("0x{:X}", get_value(kk, &state)) },
       //["oprint", kk] => { println!("0o{:o}", get_value(kk, &state)) }
       
+      ["exit"] => {
+        println!("exit");
+        break;
+      },
       // Arithmetic
-      ["add", kk, kx, ky] => {
+      [op, kk, kx, ky] => {
         let vx = get_value(kx.to_string(), &mut state).unwrap();
         let vy = get_value(ky.to_string(), &mut state).unwrap();
         set_value(
           &mut state,
           kk.to_string(),
-          vx + vy
+          match op {
+            &"add" => vx + vy,
+            &"sub" => vx - vy,
+            &"mul" => vx * vy,
+            &"div" => vx / vy,
+            &"and" => vx & vy,
+            &"or"  => vx | vy,
+            &"xor" => vx ^ vy,
+            // We lose the `_` in the outer match, but this is so much nicer
+            _ => todo!()
+          }
         );
       },
-      /*
-      ["sub", kk, kx, ky] => {
-        state.insert(
+      [op, kk, kx] => {
+        let vx = get_value(kx.to_string(), &mut state).unwrap();
+        set_value(
+          &mut state,
           kk.to_string(),
-          get_value(kx, &state).unwrap() - get_value(ky, &state).unwrap()
+          match op {
+            &"not" => !vx,
+            _ => todo!()
+          }
         );
-      },
-      ["mul", kk, kx, ky] => {
-        state.insert(
-          kk.to_string(),
-          get_value(kx, &state).unwrap() * get_value(ky, &state).unwrap()
-        );
-      },
-      ["div", kk, kx, ky] => {
-        state.insert(
-          kk.to_string(),
-          get_value(kx, &state).unwrap() / get_value(ky, &state).unwrap()
-        );
-      },
-      ["and", kk, kx, ky] => {
-        state.insert(
-          kk.to_string(),
-          get_value(kx, &state).unwrap() & get_value(ky, &state).unwrap()
-        );
-      },
-      ["or", kk, kx, ky] => {
-        state.insert(
-          kk.to_string(),
-          get_value(kx, &state).unwrap() | get_value(ky, &state).unwrap()
-        );
-      },
-      ["xor", kk, kx, ky] => {
-        state.insert(
-          kk.to_string(),
-          get_value(kx, &state).unwrap() ^ get_value(ky, &state).unwrap()
-        );
-      },
-      ["not", kk, kx] => {
-        state.insert(
-          kk.to_string(),
-          !get_value(kx, &state).unwrap()
-        );
-      },
-      */
-      ["exit"] => {
-        println!("exit");
-        break;
       },
       _ => println!("{:?}", input_tokens),
     }
