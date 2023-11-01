@@ -32,11 +32,45 @@ fn main() {
   // State: Variable hashmap of String key to i64 value
   let mut state: HashMap<String, Vec<Number>> = HashMap::new();
   
+  state.insert("__pc".to_string(), vec![Number::I64(0)]);
+  state.insert("__cc".to_string(), vec![Number::I64(0)]);
+  
   
   loop {
     print!(">>> ");
-    let input_string: String = input();
-    let input_tokens: Vec<&str> = input_string.split(" ").collect::<Vec<&str>>();
+    // Increment PC and Cycle counter
+    let _pc = get_value_from_state(
+      &mut state,
+      "__pc".to_string(),
+      Some(0)
+    ).unwrap().to_i64() as usize;
+
+    let _cc = get_value_from_state(
+      &mut state,
+      "__cc".to_string(),
+      Some(0)
+    ).unwrap();
+
+    set_value(
+      &mut state,
+      "__pc".to_string(),
+      Number::I64(_pc as i64) + Number::I64(1)
+    );
+
+    set_value(
+      &mut state,
+      "__cc".to_string(),
+      _cc + Number::I64(1),
+    );
+    
+    // Get new instruction
+    if instructions.len() <= _pc {
+      instructions.push(input());
+    }
+    let instruction_string: String = instructions.get(_pc).unwrap().to_string();
+
+    // Tokenize input
+    let input_tokens: Vec<&str> = instruction_string.split(" ").collect::<Vec<&str>>();
     
     // Operate on each line
     match input_tokens.as_slice() {
@@ -91,18 +125,13 @@ fn main() {
       },
       _ => println!("{:?}", input_tokens),
     }
-    
     println!("Updated state: {:?}", state);
-    idx += 1;
+ 
   }
 }
 
 /*
 TODOs:
-
-- Finish operands
-- idx, pc update automatically
-- Instruction is indexed by pc
 - Store and refer to labels
 - Implement `jump if`
 
@@ -148,6 +177,10 @@ DONEs:
 - Implement `array`
 - Indexed list of numbers stored in `state`
 - Implement `input`
+- idx, pc update
+- Add to instructions each input
+- Instruction indexed by pc
+
 
 
 */

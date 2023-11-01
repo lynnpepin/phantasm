@@ -8,6 +8,29 @@ pub enum Number {
     I64(i64),
 }
 
+// impl to_i64 for Number
+impl Number {
+  pub fn to_i64(&self) -> i64 {
+    match self {
+      Number::I64(val) => *val,
+      Number::F64(val) => *val as i64,
+    }
+  }
+  
+  pub fn to_f64(&self) -> f64 {
+    match self {
+      Number::I64(val) => *val as f64,
+      Number::F64(val) => *val,
+    }
+  }
+  
+  pub fn to_bits(&self) -> u64 {
+    match self {
+      Number::I64(val) => *val as u64,
+      Number::F64(val) => *val as u64,
+    }
+  }
+}
 
 impl fmt::Display for Number {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
