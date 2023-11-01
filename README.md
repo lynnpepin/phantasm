@@ -41,7 +41,29 @@ Turns out Phantasm is the name of a famous horror movie... And hey, this is an i
 
 ---
 
-Operators:
+# Basic usage
+
+```
+# Instantiate variables by name.
+# Variables can't be numbers, but other than that, go wild
+set x 1
+set y 2.3
+
+# Addition: z = x + y
+# Z is instantiated, and is dynamically cast to to float
+add z x y
+
+comments are implicit btw. anything not interpreted as an op is a comment, including this line 
+
+# You can define arrays too, but operands are not vectorized between them
+set some_array 10,20,30,40,50
+# some_value = some_array[2] = 30
+get some_value some_array 2
+
+# Jumps: TODO
+```
+
+# Operators:
 
 - **Arithmetic** operators cast to float when necessary:
   - `add k x y`
@@ -81,9 +103,9 @@ set y 0,10,20,30,40
 add z.4 x.3 y.4
 # expect z = [0, 0, 0, 43.0]
 
-# Loop from i = 0 to i = 10
+# Loop from i = 0 to i = 3
 set i 0
-set N 10
+set N 3
 loop:
 add i i 1
 sub left N i
