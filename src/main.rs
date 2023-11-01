@@ -31,7 +31,12 @@ fn main() {
   let mut idx: usize = 0;
   // State: Variable hashmap of String key to i64 value
   let mut state: HashMap<String, Vec<Number>> = HashMap::new();
-  
+
+  // Labels: Used for jumping
+  let mut labels: HashMap<String, usize> = HashMap::new();
+
+  // Initialize state
+  labels.insert("__start".to_string(), 0);
   state.insert("__pc".to_string(), vec![Number::I64(0)]);
   state.insert("__cc".to_string(), vec![Number::I64(0)]);
   
@@ -63,14 +68,15 @@ fn main() {
       _cc + Number::I64(1),
     );
     
-    // Get new instruction
+    // Get new instruction and tokenize it
     if instructions.len() <= _pc {
       instructions.push(input());
     }
     let instruction_string: String = instructions.get(_pc).unwrap().to_string();
-
-    // Tokenize input
-    let input_tokens: Vec<&str> = instruction_string.split(" ").collect::<Vec<&str>>();
+    let input_tokens: Vec<&str> = instruction_string
+      .split_whitespace()
+      .collect::<Vec<&str>>()
+    ;
     
     // Operate on each line
     match input_tokens.as_slice() {
@@ -83,10 +89,10 @@ fn main() {
       },
       ["print"] => { println!("{:?}", state) },
       ["print", kk] => { println!("{:?}", get_value(kk.to_string(), &mut state)); },
-      // todo: need to figure out how to just derive all of these from primitive
-      //["bprint", kk] => { println!("0b{:b}", get_value(kk, &state)) },
-      //["xprint", kk] => { println!("0x{:X}", get_value(kk, &state)) },
-      //["oprint", kk] => { println!("0o{:o}", get_value(kk, &state)) }
+      [label] if label.ends_with(":") => {
+        labels.insert(label.to_string(), _pc);
+        println!("Updated labels: {:?}", labels);
+      },
       
       ["exit"] => {
         println!("exit");
