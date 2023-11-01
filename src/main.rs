@@ -148,6 +148,7 @@ fn main() {
       },
       _ => println!("{:?}", input_tokens),
     }
+    println!("{};", instruction_string);
     println!("Updated state: {:?}", state);
  
   }
@@ -157,12 +158,14 @@ fn main() {
 TODOs:
 - Implement lt, gt, leq, geq, eq, neq
 - Implement branch versions of above
+- Implement bubblesort and array get/set matches
+
+Maybe:
 - Implement `input()`
 - Get instructions from stdin.
 
 
 Big things:
-
 - Conditions and branches
 - Basic programs
 - Instructions from stdin. (let someone file > program)
