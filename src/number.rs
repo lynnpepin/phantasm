@@ -186,3 +186,15 @@ impl Not for Number {
       }
   }
 }
+
+// impl Not Equal 
+impl PartialEq for Number {
+  fn eq(&self, other: &Self) -> bool {
+      match (self, other) {
+          (Number::I64(a), Number::I64(b)) => a == b,
+          (Number::I64(a), Number::F64(b)) => *a as f64 == *b,
+          (Number::F64(a), Number::I64(b)) => *a == *b as f64,
+          (Number::F64(a), Number::F64(b)) => a == b,
+      }
+  }
+}

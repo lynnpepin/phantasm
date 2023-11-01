@@ -90,10 +90,27 @@ fn main() {
       ["print"] => { println!("{:?}", state) },
       ["print", kk] => { println!("{:?}", get_value(kk.to_string(), &mut state)); },
       [label] if label.ends_with(":") => {
-        labels.insert(label.to_string(), _pc);
+        labels.insert(
+          label
+            .to_string()
+            .replace(":", ""),
+          _pc
+        );
         println!("Updated labels: {:?}", labels);
       },
-      
+      ["jif", kk, label] => {
+        let vv = get_value(kk.to_string(), &mut state).unwrap();
+        let label_idx = labels.get(*label).unwrap().to_owned();
+        if vv != Number::I64(0) {
+          set_value(
+            &mut state,
+            "__pc".to_string(),
+            Number::I64((label_idx + 1) as i64)
+          )
+        } else {
+          Ok(())
+        };
+      },
       ["exit"] => {
         println!("exit");
         break;
@@ -138,19 +155,14 @@ fn main() {
 
 /*
 TODOs:
-- Store and refer to labels
-- Implement `jump if`
-
+- Implement lt, gt, leq, geq, eq, neq
+- Implement branch versions of above
+- Implement `input()`
 - Get instructions from stdin.
-- No more interactive input!
-- But now we have a list of instructions...
-- Tokenize and store in list
 
 
 Big things:
 
-- Metadata (cycle count), PC in instructions
-- Arrays
 - Conditions and branches
 - Basic programs
 - Instructions from stdin. (let someone file > program)
@@ -186,7 +198,13 @@ DONEs:
 - idx, pc update
 - Add to instructions each input
 - Instruction indexed by pc
-
+- Store and refer to labels
+- Implement `jump if`
+- ~~No more interactive input!
+- But now we have a list of instructions...
+- Tokenize and store in list
+- Metadata (cycle count), PC in instructions
+- Arrays
 
 
 */
