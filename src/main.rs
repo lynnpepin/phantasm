@@ -3,9 +3,7 @@ use std::io::{stdin, stdout, Write};
 mod number;
 use number::Number;
 mod array;
-use array::{parse_numbers, get_value_from_state, get_value, set_value};
-
-use crate::array::set_value_in_state;
+use array::{parse_numbers, get_value_from_state, get_value, set_value_from_string, set_value};
 
 // Get input string from stdin
 fn input() -> String {
@@ -45,7 +43,7 @@ fn main() {
     match input_tokens.as_slice() {
       // Directly manipulate and view state
       ["set", kk, vv] => {
-        set_value(&mut state, kk.to_string(), vv.to_string());
+        set_value_from_string(&mut state, kk.to_string(), vv.to_string());
       },
       ["del", kk] => {
         state.remove(&kk.to_string());
@@ -61,15 +59,11 @@ fn main() {
       ["add", kk, kx, ky] => {
         let vx = get_value(kx.to_string(), &mut state).unwrap();
         let vy = get_value(ky.to_string(), &mut state).unwrap();
-        set_value_in_state(
+        set_value(
           &mut state,
           kk.to_string(),
-          None,
-          vec![vx + vy]
+          vx + vy
         );
-        // TODO: Handle something like add z.5 x.3 y.2
-        // Rename `set_value` to `set_value_from_string`
-        // Implement `set_value(dict, string, number)
       },
       /*
       ["sub", kk, kx, ky] => {
@@ -130,10 +124,11 @@ fn main() {
 /*
 TODOs:
 
-- Implement `array`
-- Indexed list of numbers stored in `state`
-- Implement `input`
-
+- Finish operands
+- idx, pc update automatically
+- Instruction is indexed by pc
+- Store and refer to labels
+- Implement `jump if`
 
 - Get instructions from stdin.
 - No more interactive input!
@@ -164,12 +159,19 @@ Longterm things:
 - Docstrings
 - Review all the functions, redundancy, etc.
 
+Nice to have:
+- Clean up array.rs
+- Clean up printing
+
 DONEs:
 - Implement set, state on i64
 - Implement add, etc. on i64
 - Implement "Number" over i64, f64
 - Implement parsing Number from string
 - Change get state
+- Implement `array`
+- Indexed list of numbers stored in `state`
+- Implement `input`
 
 
 */

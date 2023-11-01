@@ -150,8 +150,9 @@ pub fn set_value_in_state(
   }
 }
 
+
 // Set state[token] = [val1, val2, ...] or state[key][idx] = [val1, val2, ...],
-pub fn set_value(
+pub fn set_value_from_string(
   state: &mut HashMap<String, Vec<Number>>,
   token: String,
   value: String,
@@ -224,3 +225,49 @@ pub fn set_value(
     },
   }
 }
+
+// Parse idx from token, then call set_value_in_vec_in_state
+pub fn set_value(
+  state: &mut HashMap<String, Vec<Number>>,
+  token: String,
+  value: Number,
+) -> Result<(), &str> {
+  match token.split_once('.') {
+    Some((key, index_str)) => {
+      //println!(".. .. key: {}, index_str: {}", key, index_str);
+      match index_str.parse::<usize>() {
+        Ok(idx) => {
+          set_value_in_state(
+            state,
+            key.to_string(),
+            Some(idx),
+            vec![value]
+          );
+          Ok(())
+        },
+        Err(ParseIntError) => {Err("Could not parse index in set_value call")}
+      }
+    },
+    None => {
+      // k is not indexed; overwrite entire k with value
+      state.insert(
+        token.to_string(),
+        vec![value]
+      );
+      Ok(())
+    }
+  }
+}
+
+
+/*
+parse_numbers(&String) -> Vec<Number>
+get_value_from_state(state, key, idx=0) -> Number
+get_value(token, state) -> Number
+set_value_in_state(state, key, idx=0, values); // state[key][idx:] = values
+set_value_from_string(state, token, value); value is string
+set_value(state, token, value); 
+
+// TODO:
+1. Clean this up! A lot of code is duplicated
+*/
