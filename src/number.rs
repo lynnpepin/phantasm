@@ -1,5 +1,6 @@
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div, BitAnd, BitOr, BitXor, Not, Shl, Shr};
+use std::cmp::{PartialEq, PartialOrd, Ordering};
 
 // Dynamic-typed number
 #[derive(Debug, Clone, Copy)]
@@ -187,7 +188,7 @@ impl Not for Number {
   }
 }
 
-// impl Not Equal 
+// Used for =, !=
 impl PartialEq for Number {
   fn eq(&self, other: &Self) -> bool {
       match (self, other) {
@@ -197,4 +198,16 @@ impl PartialEq for Number {
           (Number::F64(a), Number::F64(b)) => a == b,
       }
   }
+}
+
+// Used for <, <=, >=, >
+impl PartialOrd for Number {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (Number::I64(a), Number::I64(b)) => a.partial_cmp(b),
+            (Number::I64(a), Number::F64(b)) => (*a as f64).partial_cmp(b),
+            (Number::F64(a), Number::I64(b)) => a.partial_cmp(&(*b as f64)),
+            (Number::F64(a), Number::F64(b)) => a.partial_cmp(b),
+        }
+    }
 }

@@ -3,9 +3,10 @@
 Phantasm is a fantasy assembly language with:
 
  - Named variables, no registers
- - Interpreted. *For no reason! Your code runs on strings and you are going to like it.*
- - Dynamic typing between `f64` and `i64`. *Who needs unsigned ints?*
+ - Interpreted. *Your code runs on strings and you are going to like it.*
+ - Dynamic typing between `f64` and `i64`. *Who needs unsigned ints and static types?*
  - No formal grammar, no tree sitter, no language server.
+ - Slow: Estimated 500KHz clock speed on an M1 Pro CPU
 
 ```
 >>> set s 1000 
@@ -55,8 +56,15 @@ add z x y
 
 comments are implicit btw. anything not interpreted as an op is a comment, including this line 
 
-# You can define arrays too, but operands are not vectorized between them
+# You can define arrays too, zero-indexed
+# operands are not vectorized between them. you can't add two arrays
 set some_array 10,20,30,40,50
+
+# you can index arrays for convenience
+add blah.4 100 some_array.2
+# blah = [0, 0, 0, 0, 130]
+# you can't write "blah.x" to get blah[1] though
+
 # some_value = some_array[2] = 30
 get some_value some_array 2
 
@@ -85,6 +93,20 @@ get some_value some_array 2
 
 ---
 
+# Under the hood
+
+- The entire state is stored under a list of `instructions: Vec<String>` and a `state: HashMap<String, Vec<Number>>`.
+- **Dynamic typing:** `Number` is a custom type that defines ops between `i64` and `f64` for dynamic typing.
+- **Instructions:** Instructions are interpreted at each "cycle" and cannot be directly modified by running code.
+- **Variables:** Variables are stored in `state`. There are not scalars, just one-long `Vec<Number>`.
+- **Special variables** store program state. These are the program counter (`__pc`), the cycle counter (`__cc`), and labels (`__label_{label}`).
+- **Program counter:** Stored in `state` as `__pc`, and can be modified (e.g. as `set __pc 123`)
+- **Labels:** These are also stored in `state`, as `__label_{label_name}`, and can be directly modified (e.g. as `set __label_loop 123`.)
+  - `__start` is a special label, defined as `__label___start = 0`.
+
+
+# Why is it called Phantasm?
+
 This language is named after "Penumbra Phantasm", a long-sought after Homestuck song by Toby Fox. It was never released in full, but its instrumentation and melody is referenced in many tracks. It's kind of a "white whale" for Homestuck music fans. Most importantly, the word ends in "asm". You can read about Penumbra Phantasm [on the Homestuck Music Wiki](https://hsmusic.wiki/track/penumbra-phantasm/), listen to [the archived 2012 livestream version](https://www.youtube.com/watch?v=RIq4GrMv96I), or the partial [Homestuck Soundtest version](https://www.youtube.com/watch?v=OdntMzdkFnk).
 
 ---
@@ -110,4 +132,22 @@ loop:
 add i i 1
 sub left N i
 jif left loop
+
+# Loop indefinitely
+set i 0
+loop:
+add i i 1
+jif 1 loop
+
+# Loop and count
+# Took ~20 seconds on M1 Pro
+set i 0
+set N 10000000
+print 1
+loop:
+add i i 1
+sub left N i
+jif left loop
+
+
 ```

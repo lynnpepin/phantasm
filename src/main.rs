@@ -27,22 +27,16 @@ fn main() {
   // Store instructions (list of str), instruction index, state (variable hashmap)
   // Instructions: List of string representing pseudo-ASM instructions
   let mut instructions: Vec<String> = Vec::new();
-  // Instruction index: Represents the currently running instruction
-  let mut idx: usize = 0;
   // State: Variable hashmap of String key to i64 value
   let mut state: HashMap<String, Vec<Number>> = HashMap::new();
 
-  // Labels: Used for jumping
-  let mut labels: HashMap<String, usize> = HashMap::new();
-
   // Initialize state
-  labels.insert("__start".to_string(), 0);
+  state.insert("__label___start".to_string(), vec![Number::I64(0)]);
   state.insert("__pc".to_string(), vec![Number::I64(0)]);
   state.insert("__cc".to_string(), vec![Number::I64(0)]);
   
   
   loop {
-    print!(">>> ");
     // Increment PC and Cycle counter
     let _pc = get_value_from_state(
       &mut state,
@@ -70,6 +64,7 @@ fn main() {
     
     // Get new instruction and tokenize it
     if instructions.len() <= _pc {
+      print!(">>> ");
       instructions.push(input());
     }
     let instruction_string: String = instructions.get(_pc).unwrap().to_string();
@@ -89,23 +84,28 @@ fn main() {
       },
       ["print"] => { println!("{:?}", state) },
       ["print", kk] => { println!("{:?}", get_value(kk.to_string(), &mut state)); },
+      
       [label] if label.ends_with(":") => {
-        labels.insert(
-          label
-            .to_string()
-            .replace(":", ""),
-          _pc
+        set_value(
+          &mut state,
+          format!("__label_{}", label.to_string().replace(":","")),
+          Number::I64(_pc as i64)
         );
-        println!("Updated labels: {:?}", labels);
       },
+
       ["jif", kk, label] => {
         let vv = get_value(kk.to_string(), &mut state).unwrap();
-        let label_idx = labels.get(*label).unwrap().to_owned();
+        let label_idx = get_value_from_state(
+          &mut state,
+          format!("__label_{}", label.to_string()),
+          Some(0)
+        ).unwrap();
+          
         if vv != Number::I64(0) {
           set_value(
             &mut state,
             "__pc".to_string(),
-            Number::I64((label_idx + 1) as i64)
+            label_idx + Number::I64(1),
           )
         } else {
           Ok(())
@@ -130,6 +130,12 @@ fn main() {
             &"and" => vx & vy,
             &"or"  => vx | vy,
             &"xor" => vx ^ vy,
+            &"eq"  => Number::I64((vx == vy) as i64),
+            &"neq" => Number::I64((vx != vy) as i64),
+            &"gt"  => Number::I64((vx > vy) as i64),
+            &("geq" | "gte") => Number::I64((vx >= vy) as i64),
+            &"lt"  => Number::I64((vx < vy) as i64),
+            &("leq" | "lte") => Number::I64((vx <= vy) as i64),
             // We lose the `_` in the outer match, but this is so much nicer
             _ => todo!()
           }
@@ -148,21 +154,24 @@ fn main() {
       },
       _ => println!("{:?}", input_tokens),
     }
-    println!("{};", instruction_string);
-    println!("Updated state: {:?}", state);
+    //println!("{};", instruction_string);
+    //println!("Updated state: {:?}", state);
  
   }
 }
 
 /*
 TODOs:
-- Implement lt, gt, leq, geq, eq, neq
-- Implement branch versions of above
+- Implement set/get for arrays
+- Redo `label` as namespaced `_label_{label}`
+- Implement branch versions of eq/ords
 - Implement bubblesort and array get/set matches
 
 Maybe:
 - Implement `input()`
 - Get instructions from stdin.
+- Printing on/off by setting `__verbose`
+- Implement constants, and vars like `time()`
 
 
 Big things:
@@ -208,6 +217,7 @@ DONEs:
 - Tokenize and store in list
 - Metadata (cycle count), PC in instructions
 - Arrays
+- Implement lt, gt, leq, geq, eq, neq
 
 
 */
