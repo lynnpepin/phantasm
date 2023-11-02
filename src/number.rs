@@ -131,7 +131,7 @@ impl Div for Number {
   type Output = Number;
   fn div(self, other: Number) -> Number {
       // Could be a oneliner by a better rustacean
-      // and I am so sleepy
+      // but I am so sleepy
       match (self, other) {
           (Number::I64(a), Number::I64(b)) => Number::F64(a as f64 / b as f64),
           (Number::I64(a), Number::F64(b)) => Number::F64(a as f64 / b),
@@ -211,3 +211,8 @@ impl PartialOrd for Number {
         }
     }
 }
+
+/*
+ - Cleanup item one: Implement FromString which creates I64, F64 dynamically
+ - Then, update array::set_value_from_string to use it
+*/

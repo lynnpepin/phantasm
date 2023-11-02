@@ -2,24 +2,42 @@ use std::collections::HashMap;
 use crate::number::Number;
 use std::num::ParseIntError;
 
+// This is all very bad and should be cleaned up and fixed
+// A lot of functionality is duplicated and unclear
+
+// Ideas:
+/*
+We want to be able to do things like
+add z.4 x.i 3     == z[4] = x[i] + 3
+sub z   y.0 z     == z[0] = y.0  + 3
+
+
+
+
+get_key_ii(token) -> Option<(key, Option<index>)>:
+  - Use this to parse each string token for indexing
+  - "z.4"  -> Some("z", Some(4))
+  - "z"    -> Some("z", None)
+    Interpreted as z[0] in some/most cases
+  - "4"    -> None()
+
+get_mut_ref_val(state, key, index) -> Option<&Vec<Number>>
+  - Use this with Some returned from get_key(token)
+  - Gets state[key][index] which can be updated
+  - None() if key does not exist
+
+*/
+
 // Parse comma-separated string to numbers
-pub fn parse_numbers(ss: &String) -> Result<Vec<Number>, ()> {
-  //Helper function to parse a comma-separated list of numbers
-  // If any of the numbers fail to parse, return Err ()
-  // Todo: Clean this up, better E
-  let mut vec: Vec<Number> = Vec::new();
-  for token in ss.split(",") {
-    if let Ok(num) = token.parse::<i64>() {
-      vec.push(Number::I64(num));
-    } else if let Ok(num) = token.parse::<f64>() {
-      vec.push(Number::F64(num));
-    } else {
-      //println!("parse_numbers({}): Could not parse {} as number", ss, token);
-      return Err(())
-    }
-  }
-  Ok(vec)
+pub fn parse_number(ss: &String) -> Result<Number, 0> {
+  ss.parse::<i64>().map(Number::I64)
+    .or(ss.parse::<f64>().map(Number::F64))
 }
+
+pub fn parse_numbers(ss: &String) -> Result<Vec<Number>, ()> {
+  ss.split(",").map(|token| parse_number(token)).collect()
+}
+
 
 // Helper func for state[key][idx]
 pub fn get_value_from_state(
@@ -73,6 +91,7 @@ pub fn get_value(
 }
 
 // state[key][index] = value
+// TODO: Update this to expand array
 pub fn set_value_in_vec_in_state(
   state: &mut HashMap<String, Vec<Number>>,
   key: String,

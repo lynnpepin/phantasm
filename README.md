@@ -149,5 +149,7 @@ add i i 1
 sub left N i
 jif left loop
 
+# oop
+set A 0,1,2,3
 
 ```

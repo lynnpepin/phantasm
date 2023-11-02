@@ -3,7 +3,7 @@ use std::io::{stdin, stdout, Write};
 mod number;
 use number::Number;
 mod array;
-use array::{parse_numbers, get_value_from_state, get_value, set_value_from_string, set_value};
+use array::{parse_numbers, get_value_from_state, get_value, set_value_from_string, set_value, set_value_in_vec_in_state};
 
 // Get input string from stdin
 fn input() -> String {
@@ -78,6 +78,28 @@ fn main() {
       // Directly manipulate and view state
       ["set", kk, vv] => {
         set_value_from_string(&mut state, kk.to_string(), vv.to_string());
+      },
+      ["set", kk, ii, vv] => {
+        set_value_in_vec_in_state(
+          &mut state,
+          kk.to_string(),
+          ii.parse::<usize>().ok(),
+          *parse_numbers(&vv.to_string()).unwrap().get(0).unwrap(),
+        );
+      },
+      ["get", kk, kx, ii] => {
+        // kk = kx[ii]
+        let idx = get_value(ii.to_string(), &mut state).unwrap().to_i64() as usize;
+        let vv = get_value_from_state(
+          &mut state,
+          kx.to_string(),
+          Some(idx)
+        ).unwrap();
+        set_value(
+          &mut state,
+          kk.to_string(),
+          vv,
+        );
       },
       ["del", kk] => {
         state.remove(&kk.to_string());
@@ -155,7 +177,7 @@ fn main() {
       _ => println!("{:?}", input_tokens),
     }
     //println!("{};", instruction_string);
-    //println!("Updated state: {:?}", state);
+    println!("Updated state: {:?}", state);
  
   }
 }
