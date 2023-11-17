@@ -226,3 +226,12 @@ jif left dont_set_max_as_x
 print max
 
 ```
+
+---
+
+My earliest notes for phantasm date to 2016, but it looks like I'm not the only one to use the Phantasm name for an assembly-related project.
+
+**My Phantasm is not related to either of these two projects!**
+
+- Justin Yao Du's asm-to-C [Phantasm](https://github.com/justinyaodu/phantasm)
+- Jasen Qin's [phantasm-ir](https://lib.rs/crates/phantasm-ir) Rust lib
