@@ -1,16 +1,31 @@
 # TODOs
 
-Stack
-- More ops
-- Ops can return extra cycle count to update
-- a.b.c.x.y.z indexing
-- Get length from array
-- Ability to jump to a label that has not yet been created
-- Wasm assemble
-- Webpage
+- Cleanup
 
 ---
 
+# TODOs
+
+## Prettier dev flow
+
+- Print with color and bold
+- Read program inputs from file
+- Pre-process labels from file
+
+## Better arrays
+
+- Implemenet new A.x.y.z per notes
+- Ops can return extra cycle count
+- `len` op for arrays
+
+## Webpage IDE
+
+- WASM assemble
+- `processor.rs` holds state, instructions; cycles are `impl`
+
+---
+
+# Old TODOs
 Stack:
 - Figure out `get_key_ii(token)`. Include state? Or something else?
 - Implement tests for above (see recursive resolution)
