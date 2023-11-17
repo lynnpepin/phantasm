@@ -29,13 +29,14 @@ get_mut_ref_val(state, key, index) -> Option<&Vec<Number>>
 */
 
 // Parse comma-separated string to numbers
-pub fn parse_number(ss: &String) -> Result<Number, 0> {
+pub fn parse_number(ss: &str) -> Result<Number, String> {
   ss.parse::<i64>().map(Number::I64)
-    .or(ss.parse::<f64>().map(Number::F64))
+  .or(ss.parse::<f64>().map(Number::F64))
+  .map_err(|_| format!("Could not parse number: {}", ss))
 }
 
-pub fn parse_numbers(ss: &String) -> Result<Vec<Number>, ()> {
-  ss.split(",").map(|token| parse_number(token)).collect()
+pub fn parse_numbers(ss: &String) -> Result<Vec<Number>, String> {
+  ss.split(",").map(parse_number).collect()
 }
 
 
