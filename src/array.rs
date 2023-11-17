@@ -279,7 +279,6 @@ pub fn set_value(
   }
 }
 
-
 /*
 parse_numbers(&String) -> Vec<Number>
 get_value_from_state(state, key, idx=0) -> Number

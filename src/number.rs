@@ -1,9 +1,13 @@
 use std::fmt;
-use std::ops::{Add, Sub, Mul, Div, BitAnd, BitOr, BitXor, Not, Shl, Shr};
+use std::ops;
+use std::ops::{
+  Add, Sub, Mul, Div,
+  BitAnd, BitOr, BitXor, Not, Shl, Shr
+};
 use std::cmp::{PartialEq, PartialOrd, Ordering};
 
 // Dynamic-typed number
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 pub enum Number {
     F64(f64),
     I64(i64),
@@ -34,6 +38,15 @@ impl Number {
 }
 
 impl fmt::Display for Number {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+      match self {
+          Number::I64(val) => val.fmt(f),
+          Number::F64(val) => val.fmt(f),
+      }
+  }
+}
+
+impl fmt::Debug for Number {
   fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
       match self {
           Number::I64(val) => val.fmt(f),
@@ -212,7 +225,27 @@ impl PartialOrd for Number {
     }
 }
 
+// Format Vec<Number>, copied wholesale from https://github.com/apolitical/impl-display-for-vec
+struct Numbers(Vec<Number>);
+
+impl ops::Deref for Numbers {
+  type Target = Vec<Number>;
+  fn deref(&self) -> &Self::Target {&self.0}
+}
+
+impl fmt::Display for Numbers {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    self.iter().fold(Ok(()), |result, album| {
+      result.and_then(|_| writeln!(f, "{}", album))
+    })
+  }
+}
+
+
+//Format HashMap<String, Vec<Number>>; todo
+
 /*
  - Cleanup item one: Implement FromString which creates I64, F64 dynamically
  - Then, update array::set_value_from_string to use it
 */
+

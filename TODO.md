@@ -1,5 +1,12 @@
 # TODOs
 
+Stack
+- Webpage
+- Wasm assemble
+- `state.rs`, `input.rs`
+
+---
+
 Stack:
 - Figure out `get_key_ii(token)`. Include state? Or something else?
 - Implement tests for above (see recursive resolution)
