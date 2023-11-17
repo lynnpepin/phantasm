@@ -32,7 +32,7 @@ print max
 # Ok(20)
 ```
 
-```
+```asm
 >>> set s 1000 
 set s = 1000
 Updated state: {"s": I64(1000)}
