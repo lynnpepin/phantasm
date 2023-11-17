@@ -2,14 +2,14 @@
 
 Phantasm is a fantasy assembly language with these phantastic pheatures:
 
- - Named variables, no registers
+ - Named variables, no registers.
  - Interpreted. *Your code runs on strings and you are going to like it.*
  - Dynamic typing between `f64` and `i64`. *Who needs unsigned ints and static types?*
  - No formal grammar, no tree sitter, no language server.
  - Slow: Estimated 500KHz clock speed on an M1 Pro CPU
 
 ```asm
-# Find max
+# Program to find max
 set __verbose 0
 set A 3,1,20,6,2,16,20,19,3,17
 set i 0
@@ -33,6 +33,7 @@ print max
 ```
 
 ```asm
+# Also interactive! Just `cargo run`
 >>> set s 1000 
 set s = 1000
 Updated state: {"s": I64(1000)}
@@ -52,7 +53,7 @@ Updated state: {"s": F64(1061.208), "r": F64(1.02)}
 ["yessssssssssss"]
 ```
 
-Phantasm is super unstable because I am still writing it! Don't use this!
+Phantasm is super unstable because I am still writing it! Don't use this! It's a toy! I'm writing this for fun!
 
 ---
 
@@ -67,7 +68,7 @@ Turns out Phantasm is the name of a famous horror movie... And hey, this is an i
 
 # Basic usage
 
-```
+```asm
 # Instantiate variables by name.
 # Variables can't be numbers, but other than that, go wild
 set x 1
@@ -91,7 +92,14 @@ add blah.4 100 some_array.2
 # some_value = some_array[2] = 30
 get some_value some_array 2
 
-# Jumps: TODO
+loop:
+# that's a label
+set N 10
+set left N
+print left
+sub left left 1
+# Jump if any values are left:
+jif left
 ```
 
 # Operators:
