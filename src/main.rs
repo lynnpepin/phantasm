@@ -5,6 +5,7 @@ use number::Number;
 mod array;
 use array::{parse_numbers, get_value_from_state, get_value, set_value_from_string, set_value, set_value_in_vec_in_state};
 
+
 // Get input string from stdin
 fn input() -> String {
   let mut ss = String::new();
@@ -34,6 +35,7 @@ fn main() {
   state.insert("__label___start".to_string(), vec![Number::I64(0)]);
   state.insert("__pc".to_string(), vec![Number::I64(0)]);
   state.insert("__cc".to_string(), vec![Number::I64(0)]);
+  state.insert("__verbose".to_string(), vec![Number::I64(1)]);
   
   
   loop {
@@ -104,6 +106,17 @@ fn main() {
       ["del", kk] => {
         state.remove(&kk.to_string());
       },
+      ["input", kk] => {
+        set_value_from_string(&mut state, kk.to_string(), input());
+      },
+      ["input", kk, ii] => {
+        set_value_in_vec_in_state(
+          &mut state,
+          kk.to_string(),
+          ii.parse::<usize>().ok(),
+          *parse_numbers(&input()).unwrap().get(0).unwrap(),
+        );
+      },
       ["print"] => { println!("{:?}", state) },
       ["print", kk] => { println!("{:?}", get_value(kk.to_string(), &mut state)); },
       
@@ -122,8 +135,8 @@ fn main() {
           format!("__label_{}", label.to_string()),
           Some(0)
         ).unwrap();
-          
-        if vv != Number::I64(0) {
+         
+        if vv >= Number::F64(1.0) {
           set_value(
             &mut state,
             "__pc".to_string(),
@@ -163,6 +176,7 @@ fn main() {
           }
         );
       },
+      // Other ops
       [op, kk, kx] => {
         let vx = get_value(kx.to_string(), &mut state).unwrap();
         set_value(
@@ -174,10 +188,22 @@ fn main() {
           }
         );
       },
-      _ => println!("{:?}", input_tokens),
+      // do nothing
+      _ => (),
+      //println!("{:?}", input_tokens),
     }
-    //println!("{};", instruction_string);
-    println!("Updated state: {:?}", state);
+    let verbose = get_value("__verbose".to_string(), &mut state).unwrap();
+    if verbose >= Number::I64(1) {
+      if verbose >= Number::I64(2) {
+        if verbose >= Number::I64(3) {
+          println!("{:?}", instructions);
+        } else {
+          println!("{};", instruction_string);
+        }
+      }
+      println!("Updated state: {:?}", state);
+    }
+
  
   }
 }
@@ -185,15 +211,9 @@ fn main() {
 /*
 TODOs:
 - Implement set/get for arrays
-- Redo `label` as namespaced `_label_{label}`
+- Implement A.x.y.z indexing
 - Implement branch versions of eq/ords
 - Implement bubblesort and array get/set matches
-
-Maybe:
-- Implement `input()`
-- Get instructions from stdin.
-- Printing on/off by setting `__verbose`
-- Implement constants, and vars like `time()`
 
 
 Big things:
@@ -218,9 +238,10 @@ Longterm things:
 
 Nice to have:
 - Clean up array.rs
-- Clean up printing
 
 DONEs:
+- Implement `input()` op
+- Get instructions from stdin.
 - Implement set, state on i64
 - Implement add, etc. on i64
 - Implement "Number" over i64, f64
@@ -240,6 +261,10 @@ DONEs:
 - Metadata (cycle count), PC in instructions
 - Arrays
 - Implement lt, gt, leq, geq, eq, neq
+- Implement constants, and vars like `time()`
+- Printing on/off by setting `__verbose`
+- Redo `label` as namespaced `_label_{label}`
+- Clean up printing
 
 
 */

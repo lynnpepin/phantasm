@@ -1,9 +1,13 @@
 # TODOs
 
 Stack
-- Webpage
+- More ops
+- Ops can return extra cycle count to update
+- a.b.c.x.y.z indexing
+- Get length from array
+- Ability to jump to a label that has not yet been created
 - Wasm assemble
-- `state.rs`, `input.rs`
+- Webpage
 
 ---
 
